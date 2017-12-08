@@ -1,6 +1,13 @@
 ﻿using System;
 using Xamarin.Forms;
-using WebScraper.Commands;
+using Plugin.Screenshot;
+using Plugin.Media;
+using Xamarin.Forms.PlatformConfiguration;
+using Plugin.Messaging;
+using System.IO;
+using System.Diagnostics;
+using Plugin.Share;
+using Plugin.Share.Abstractions;
 
 namespace WebScraper
 {
@@ -9,14 +16,29 @@ namespace WebScraper
         public WebScraperPage()
         {
             InitializeComponent();
-            //getHtml();
         }
 
-        public void getHtml(object sender, EventArgs args)
+        public async void GetScreenShot(object sender, EventArgs e)
         {
-            var htmlReturned = new GetHtmlCall();
-            var output = htmlReturned.scrapePageHtml();
+            try
+            {
+                //await CrossScreenshot.Current.CaptureAndSaveAsync();
+                await CrossShare.Current.Share(new ShareMessage
+                {
+                    Title = "Motz Cod.es",
+                    Url = "http://motzcod.es"
+                },
+                new ShareOptions
+                {
+                    ChooserTitle = "Share Blog",
+                    ExcludedUIActivityTypes = new[] { ShareUIActivityType.PostToFacebook }
+                });
 
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "ok");
+            }
         }
     }
 }

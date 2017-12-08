@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:local="clr-namespace:WebScraper" x:Class="WebScraper.WebScraperPage">
 	<Label Text="Welcome to Xamarin Forms!" VerticalOptions="Center" HorizontalOptions="Center" />
     <StackLayout>
-        <Button Clicked="getHtml" Text="Press me to run the program"/>
+        <Label x:Name="label"/>
+        <Button x:Name="takeScreenShot" Clicked="GetScreenShot" Text="Press me to take a screen shot"/>
     </StackLayout>
 
 </ContentPage>

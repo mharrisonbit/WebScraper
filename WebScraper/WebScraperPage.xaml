@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:local="clr-namespace:WebScraper" x:Class="WebScraper.WebScraperPage">
-	<Label Text="Welcome to Xamarin Forms!" VerticalOptions="Center" HorizontalOptions="Center" />
-    <StackLayout>
+    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
         <Label x:Name="label"/>
-        <Button x:Name="takeScreenShot" Clicked="GetScreenShot" Text="Press me to take a screen shot"/>
+        <Button x:Name="takeScreenShot" Clicked="GetScreenShot" Text="Press me to take a screen shot"/> 
+        <Frame CornerRadius="50" BackgroundColor="Black">
+            <Image x:Name="IncidentImageData" Aspect="AspectFill" HeightRequest="250" WidthRequest="100" />
+        </Frame>
     </StackLayout>
-
 </ContentPage>

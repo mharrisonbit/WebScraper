@@ -9,6 +9,8 @@ using WebScraper.Droid.Services;
 using WebScraper.Services;
 using Xamarin.Forms;
 
+[assembly: Permission(Name = "android.permission.READ_EXTERNAL_STORAGE")]
+[assembly: Permission(Name = "android.permission.WRITE_EXTERNAL_STORAGE")]
 [assembly: Dependency(typeof(ScreenGrab))]
 namespace WebScraper.Droid.Services
 {
@@ -19,44 +21,34 @@ namespace WebScraper.Droid.Services
                             throw new NullReferenceException("Current Context/Activity is null, ensure that the MainApplication.cs " +
                                                              "file is setting the CurrentActivity in your source code so the Screenshot can use it.");
 
-        public byte[] Capture()
+        public void Capture()
         {
-            if (Context == null)
+            string date = DateTime.Now.ToString().Replace("/", "-").Replace(":", "-");
+
+            var screenshotPath = Android.OS.Environment.GetExternalStoragePublicDirectory("Photos").AbsolutePath + Java.IO.File.Separator + "screenshot-" + date + ".png";
+            var rootView = Context.Window.DecorView.RootView;
+
+            using (var screenshot = Bitmap.CreateBitmap(rootView.Width, rootView.Height, Bitmap.Config.Argb8888))
             {
-                throw new Exception("You have to set Screenshot.Activity in your Android project");
+                var canvas = new Canvas(screenshot);
+                rootView.Draw(canvas);
+
+                using (var screenshotOutputStream = new FileStream(screenshotPath, FileMode.Create))
+                {
+                    screenshot.Compress(Bitmap.CompressFormat.Png, 90, screenshotOutputStream);
+                    OpenShareIntent(screenshotPath);
+                    screenshotOutputStream.Flush();
+                    screenshotOutputStream.Close();
+                }
             }
-            var view = Context.Window.DecorView;
-            view.DrawingCacheEnabled = true;
-
-            Bitmap bitmap = view.GetDrawingCache(true);
-
-            byte[] bitmapData;
-
-            using (var stream = new MemoryStream())
-            {
-                bitmap.Compress(Bitmap.CompressFormat.Png, 0, stream);
-                bitmapData = stream.ToArray();
-            }
-
-            return bitmapData;
         }
 
         public async Task CapturePNG()
         {
-            var bytes = Capture();
-            Java.IO.File picturesFolder = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures);
-            string date = DateTime.Now.ToString().Replace("/", "-").Replace(":", "-");
-            string filePath = System.IO.Path.Combine(picturesFolder.AbsolutePath, "Screenshot-" + date + ".png");
-            using (FileStream SourceStream = File.Open(filePath, FileMode.OpenOrCreate))
-            {
-                SourceStream.Seek(0, SeekOrigin.End);
-                await SourceStream.WriteAsync(bytes, 0, bytes.Length);
-            }
-
-            OpenShareIntent(filePath);
+            Capture();
         }
 
-        public void OpenShareIntent(string filePath)
+        private void OpenShareIntent(string filePath)
         {
             var imageUri = Android.Net.Uri.Parse($"file://{filePath}");
             var myIntent = new Intent(Intent.ActionSend);
